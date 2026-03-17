@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login — Attendance Manager</title>
+  <style>
+    :root {
+      --bg: #0f172a; --card: #1e293b; --border: #334155;
+      --accent: #6366f1; --accent2: #818cf8;
+      --text: #f1f5f9; --muted: #94a3b8; --radius: 12px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg); color: var(--text);
+      min-height: 100vh; display: flex;
+      align-items: center; justify-content: center; padding: 20px;
+    }
+    .login-box {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 36px 28px;
+      width: 100%; max-width: 380px;
+    }
+    .logo { text-align: center; margin-bottom: 28px; }
+    .logo .icon { font-size: 2.8rem; }
+    .logo h1 { font-size: 1.3rem; font-weight: 700; color: var(--accent2); margin-top: 8px; }
+    .logo p { font-size: .82rem; color: var(--muted); margin-top: 4px; }
+    label { display: block; font-size: .83rem; color: var(--muted); margin-bottom: 5px; }
+    input {
+      width: 100%; padding: 11px 14px; background: var(--bg);
+      border: 1px solid var(--border); border-radius: 8px;
+      color: var(--text); font-size: .95rem; margin-bottom: 16px;
+      outline: none; transition: border .2s;
+    }
+    input:focus { border-color: var(--accent); }
+    .btn {
+      width: 100%; padding: 12px; background: var(--accent);
+      color: #fff; border: none; border-radius: 8px;
+      font-size: 1rem; font-weight: 600; cursor: pointer; transition: background .2s;
+    }
+    .btn:hover { background: var(--accent2); }
+    .flash-list { list-style: none; margin-bottom: 16px; }
+    .flash-list li {
+      padding: 10px 14px; border-radius: 8px; font-size: .88rem; margin-bottom: 6px;
+    }
+    .flash-list li.success { background: #14532d55; border: 1px solid #22c55e55; color: #86efac; }
+    .flash-list li.danger  { background: #7f1d1d55; border: 1px solid #ef444455; color: #fca5a5; }
+  </style>
+</head>
+<body>
+<div class="login-box">
+  <div class="logo">
+    <div class="icon">📋</div>
+    <h1>Attendance Manager</h1>
+    <p>Sign in to continue</p>
+  </div>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <ul class="flash-list">
+        {% for cat, msg in messages %}
+          <li class="{{ cat }}">{{ msg }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  {% endwith %}
+
+  <form method="POST" action="/login">
+    <label>Username</label>
+    <input type="text" name="username" placeholder="Enter username"
+           autocomplete="username" required autofocus/>
+    <label>Password</label>
+    <input type="password" name="password" placeholder="Enter password"
+           autocomplete="current-password" required/>
+    <button type="submit" class="btn">Sign In</button>
+  </form>
+</div>
+</body>
+</html>

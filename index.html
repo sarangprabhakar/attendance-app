@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="stat-grid">
+  <div class="stat-card">
+    <div class="num">{{ student_count }}</div>
+    <div class="lbl">Students</div>
+  </div>
+  <div class="stat-card">
+    <div class="num">{{ record_count }}</div>
+    <div class="lbl">Records</div>
+  </div>
+  <div class="stat-card">
+    <div class="num">{{ subjects | length }}</div>
+    <div class="lbl">Subjects</div>
+  </div>
+</div>
+
+<div class="card">
+  <h2>📤 Upload Weekly Attendance Sheet</h2>
+
+  <form method="POST" action="/upload" enctype="multipart/form-data">
+
+    <label>Subject</label>
+    {% if subjects %}
+    <select name="subject" id="subject-select">
+      <option value="">-- Select existing subject --</option>
+      {% for s in subjects %}
+        <option value="{{ s }}">{{ s }}</option>
+      {% endfor %}
+    </select>
+    <div class="or-row">or add new</div>
+    {% endif %}
+
+    <label>{% if subjects %}New Subject Name (leave blank to use selected){% else %}Subject Name{% endif %}</label>
+    <input type="text" name="new_subject" placeholder="e.g. Mathematics, Physics..." autocomplete="off"/>
+
+    <label>Excel File (.xlsx / .xls)</label>
+    <input type="file" name="file" accept=".xlsx,.xls" required/>
+
+    <div style="background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:16px;font-size:.82rem;color:var(--muted);">
+      <strong style="color:var(--text)">📌 Expected Excel format:</strong><br/>
+      Column 1: <em>Reg No / Roll No</em> &nbsp;|&nbsp;
+      Column 2: <em>Student Name</em> &nbsp;|&nbsp;
+      Column 3+: <em>Dates as headers (e.g. 2024-01-15) with P/A values</em>
+    </div>
+
+    <button type="submit" class="btn btn-primary" style="width:100%">Upload &amp; Save</button>
+  </form>
+</div>
+
+{% if subjects %}
+<div style="margin-top:20px;text-align:center">
+  <a href="/report" class="btn btn-outline">📊 View Attendance Report →</a>
+</div>
+{% endif %}
+
+{% endblock %}

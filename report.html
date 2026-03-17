@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="card" style="margin-bottom:20px">
+  <h2>📊 Attendance Report</h2>
+  <form method="GET" action="/report">
+    <div class="filter-row">
+      <div>
+        <label>Filter by Subject</label>
+        <select name="subject" onchange="this.form.submit()">
+          <option value="">-- All Subjects --</option>
+          {% for s in subjects %}
+            <option value="{{ s }}" {% if s == subject_filter %}selected{% endif %}>{{ s }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div style="flex:0">
+        <label>&nbsp;</label>
+        <button type="submit" class="btn btn-primary">Filter</button>
+      </div>
+    </div>
+  </form>
+  <div class="search-bar">
+    <label>Search Student</label>
+    <input type="text" id="search" placeholder="Name or Reg No..." oninput="filterTable()" autocomplete="off"/>
+  </div>
+</div>
+
+{% if rows %}
+<div class="card" style="overflow-x:auto">
+  <table id="report-table">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Reg No</th>
+        <th>Student Name</th>
+        <th>Present</th>
+        <th>Total</th>
+        <th>Attendance %</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in rows %}
+      <tr>
+        <td style="color:var(--muted)">{{ loop.index }}</td>
+        <td><strong>{{ r.regno }}</strong></td>
+        <td>{{ r.name }}</td>
+        <td style="color:var(--green)">{{ r.present }}</td>
+        <td>{{ r.total }}</td>
+        <td><strong>{{ r.percentage }}%</strong></td>
+        <td>
+          {% if r.percentage >= 75 %}
+            <span class="badge badge-green">✓ Good</span>
+          {% elif r.percentage >= 60 %}
+            <span class="badge badge-yellow">⚠ Low</span>
+          {% else %}
+            <span class="badge badge-red">✗ Poor</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap">
+  <a href="/api/report{% if subject_filter %}?subject={{ subject_filter }}{% endif %}"
+     target="_blank" class="btn btn-outline" style="font-size:.85rem">🔗 JSON API</a>
+  <button onclick="exportCSV()" class="btn btn-outline" style="font-size:.85rem">⬇ Export CSV</button>
+</div>
+
+{% else %}
+<div class="card" style="text-align:center;padding:40px;color:var(--muted)">
+  <div style="font-size:2.5rem;margin-bottom:12px">📭</div>
+  <div>No attendance records found.</div>
+  {% if subject_filter %}<div style="margin-top:6px;font-size:.85rem">Try selecting a different subject.</div>{% endif %}
+</div>
+{% endif %}
+
+<script>
+function filterTable() {
+  const q = document.getElementById('search').value.toLowerCase();
+  document.querySelectorAll('#report-table tbody tr').forEach(tr => {
+    tr.style.display = tr.innerText.toLowerCase().includes(q) ? '' : 'none';
+  });
+}
+
+function exportCSV() {
+  const rows = [...document.querySelectorAll('#report-table tr')];
+  const csv = rows.map(r =>
+    [...r.querySelectorAll('th,td')]
+      .slice(0, 6)
+      .map(c => '"' + c.innerText.replace(/"/g,'""') + '"')
+      .join(',')
+  ).join('\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/csv,' + encodeURIComponent(csv);
+  a.download = 'attendance_report.csv';
+  a.click();
+}
+</script>
+{% endblock %}

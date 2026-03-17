@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="card" style="margin-bottom:20px">
+  <h2>👥 Manage Users</h2>
+  <p style="color:var(--muted);font-size:.85rem;margin-bottom:20px">
+    <strong style="color:#86efac">Admin</strong> — can upload sheets, view reports, manage users &nbsp;|&nbsp;
+    <strong style="color:#93c5fd">Viewer</strong> — can only view reports
+  </p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>#</th><th>Username</th><th>Role</th><th>Created</th><th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for u in users %}
+      <tr>
+        <td style="color:var(--muted)">{{ loop.index }}</td>
+        <td><strong>{{ u.username }}</strong>
+          {% if u.id == session.user_id %}
+            <span style="font-size:.75rem;color:var(--accent2)">(you)</span>
+          {% endif %}
+        </td>
+        <td>
+          {% if u.role == 'admin' %}
+            <span class="badge badge-green">admin</span>
+          {% else %}
+            <span class="badge" style="background:#1e3a5f55;color:#93c5fd;border:1px solid #3b82f644">viewer</span>
+          {% endif %}
+        </td>
+        <td style="color:var(--muted);font-size:.82rem">{{ u.created_at.strftime('%d %b %Y') }}</td>
+        <td>
+          {% if u.id != session.user_id %}
+          <form method="POST" action="/admin/users/delete/{{ u.id }}"
+                onsubmit="return confirm('Delete user {{ u.username }}?')">
+            <button type="submit" class="btn" style="padding:4px 12px;font-size:.8rem;background:#ef4444">Delete</button>
+          </form>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;flex-wrap:wrap">
+
+  <!-- Add user -->
+  <div class="card">
+    <h2>➕ Add New User</h2>
+    <form method="POST" action="/admin/users/add">
+      <label>Username</label>
+      <input type="text" name="username" placeholder="e.g. teacher1" required autocomplete="off"/>
+      <label>Password</label>
+      <input type="password" name="password" placeholder="Min 6 characters" required/>
+      <label>Role</label>
+      <select name="role">
+        <option value="viewer">Viewer (read only)</option>
+        <option value="admin">Admin (full access)</option>
+      </select>
+      <button type="submit" class="btn btn-primary">Create User</button>
+    </form>
+  </div>
+
+  <!-- Change own password -->
+  <div class="card">
+    <h2>🔑 Change My Password</h2>
+    <form method="POST" action="/admin/change-password">
+      <label>Current Password</label>
+      <input type="password" name="current_password" placeholder="Current password" required/>
+      <label>New Password</label>
+      <input type="password" name="new_password" placeholder="Min 6 characters" required/>
+      <button type="submit" class="btn btn-primary">Update Password</button>
+    </form>
+  </div>
+
+</div>
+
+<style>
+  @media(max-width:540px){
+    div[style*="grid-template-columns"] { grid-template-columns: 1fr !important; }
+  }
+</style>
+{% endblock %}
