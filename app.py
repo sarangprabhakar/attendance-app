@@ -11,8 +11,9 @@ app = Flask(__name__)
 app.secret_key = 'attendance_secret_key_2024'
 
 BASE_DIR      = os.path.dirname(os.path.abspath(__file__))
-UPLOAD_FOLDER = os.path.join(BASE_DIR, 'uploads')
-DB_PATH       = os.path.join(BASE_DIR, 'attendance.db')
+IS_RENDER     = os.environ.get('RENDER', False)
+UPLOAD_FOLDER = '/tmp/uploads' if IS_RENDER else os.path.join(BASE_DIR, 'uploads')
+DB_PATH       = '/tmp/attendance.db' if IS_RENDER else os.path.join(BASE_DIR, 'attendance.db')
 ALLOWED_EXTENSIONS = {'xlsx', 'xls'}
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
